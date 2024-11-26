@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>医学图像分割算法介绍</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            background-color: #f5f6fa;
+        }
+        .sidebar {
+            width: 280px;
+            background-color: #2B4876;
+            color: white;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+        .logo {
+            padding: 25px;
+            text-align: center;
+            rgba(255,255,255,0.1); /* 更透明的白色背景 */
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            font-weight: 700; /* 加粗 */
+            margin: 0;
+            font-size: 26px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2); /* 添加文字阴影 */
+            letter-spacing: 1px; /* 增加字间距 */
+        }
+        .nav-menu {
+            list-style: none;
+        }
+        .nav-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        .nav-item a {
+            padding: 12px 20px;
+            display: block;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        .nav-item:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: #fff;
+            transform: translateX(5px);
+        }
+        .main-content {
+            flex-grow: 1;
+        }
+        .top-nav {
+            background-color: white;
+            padding: 15px 30px;
+            display: flex;
+            gap: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .top-nav a {
+            color: #2B4876;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 20px !important;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .top-nav :hover {
+            background: rgba(42,82,152,0.1);
+        }
+        .content {
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .section-title {
+            font-size: 24px;
+            color: #2B4876;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2B4876;
+        }
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card h3 {
+            color: #2B4876;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .card-content {
+            color: #666;
+        }
+        .feature-list {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .feature-icon {
+            color: #2B4876;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .tag {
+            background: #f0f4ff;
+            color: #2B4876;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+        }
+        /* Dropdown styling */
+        .dropdown-menu {
+            display: none;
+            list-style: none;
+            padding-left: 0;
+            background-color: #2B4876;
+            position: absolute;
+            left: 20px;
+            top: 100%;
+            width: calc(100% - 40px);
+            z-index: 1;
+            border-radius: 5px;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .dropdown-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        .dropdown-arrow {
+            font-size: 0.4em; /* 或 font-size: 12px; */
+            margin-left: 6px; /* 让图标与文本稍微有一点间距 */
+        }
+
+
+    </style>
+    <script>
+        // Toggle dropdown menu display
+        function toggleDropdownMenu() {
+            var dropdownMenu = document.querySelector('.dropdown-menu');
+            dropdownMenu.classList.toggle('show');
+        }
+    </script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">医学图像分割</div>
+        <nav class="nav-menu">
+            <a href="/example" class="nav-item"><i>📊</i>常用数据集</a>
+            <a href="../about" class="nav-item"><i>🔍</i>常用算法</a>
+            <div class="nav-item dropdown-toggle" onclick="toggleDropdownMenu()">
+                <i>🔄</i> 传统分割方法 <i class="fas fa-chevron-down dropdown-arrow"></i>
+                <ul class="dropdown-menu">
+                    <li><a href="/example/classic/hippocampus" class="dropdown-item">BraTs海马体数据集</a></li>
+                    <li><a href="/example/classic/chest" class="dropdown-item">Chest胸腔数据集</a></li>
+                    <li><a href="/example/classic/eye" class="dropdown-item">DRIVE眼底血管数据集</a></li>
+                </ul>
+            </div>
+            <a href="/example/dl" class="nav-item"><i>🧠</i>深度学习分割方法</a>
+        </nav>
+    </div>
+
+
+    <div class="main-content">
+        <div class="top-nav">
+            <div style="margin-left: auto;">
+                <a href="/">🏠 主页</a>
+                <a href="/live-index">▶️ 开始检测</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2 class="section-title">传统分割方法</h2>
+            <div class="card-container">
+                <div class="card">
+                    <h3><div class="card-icon">🔍</div>边界分割</h3>
+                    <div class="card-content">
+                        <p>基于图像边界像素灰度值的不连续性进行分割。通过检测图像中的边缘和轮廓来实现目标分割。</p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>Roberts、Sobel、Prewitt等经典算子</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>Canny边缘检测多阶段处理</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>基于梯度的边缘检测方法</span>
+                            </div>
+                        </div>
+                        <div class="tag-container">
+                            <span class="tag">边缘检测</span>
+                            <span class="tag">梯度算子</span>
+                            <span class="tag">轮廓提取</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><div class="card-icon">📊</div>阈值分割</h3>
+                    <div class="card-content">
+                        <p>通过设定一个或多个阈值，将图像像素分为不同的类别。是最基础和使用最广泛的分割方法。</p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>全局阈值与局部自适应阈值</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>OTSU自动阈值选择</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>多阈值分割技术</span>
+                            </div>
+                        </div>
+                        <div class="tag-container">
+                            <span class="tag">灰度阈值</span>
+                            <span class="tag">自适应</span>
+                            <span class="tag">多级分割</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><div class="card-icon">🌱</div>区域生长</h3>
+                    <div class="card-content">
+                        <p>从种子点开始，通过区域扩张来实现分割。基于像素或区域的相似性准则进行生长。</p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>智能种子点选择</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>多特征融合生长准则</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>自适应终止条件</span>
+                            </div>
+                        </div>
+                        <div class="tag-container">
+                            <span class="tag">区域扩张</span>
+                            <span class="tag">相似性度量</span>
+                            <span class="tag">连通区域</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><div class="card-icon">📈</div>统计方法</h3>
+                    <div class="card-content">
+                        <p>利用统计学原理对图像特征进行建模，结合概率理论实现分割。适用于具有统计规律的图像。</p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>高斯混合模型(GMM)</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>马尔可夫随机场(MRF)</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>期望最大化(EM)算法</span>
+                            </div>
+                        </div>
+                        <div class="tag-container">
+                            <span class="tag">概率模型</span>
+                            <span class="tag">统计特征</span>
+                            <span class="tag">参数估计</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="section-title" style="margin-top: 40px;">深度学习方法</h2>
+            <div class="card-container">
+                <div class="card">
+                    <h3><div class="card-icon">🔄</div>FCN</h3>
+                    <div class="card-content">
+                        <p>全卷积神经网络，第一个端到端的图像分割网络。将传统CNN中的全连接层替换为卷积层。</p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>支持任意尺寸输入</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>上采样与跳跃连接</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>FCN-32s/16s/8s架构</span>
+                            </div>
+                        </div>
+                        <div class="tag-container">
+                            <span class="tag">全卷积</span>
+                            <span class="tag">像素级预测</span>
+                            <span class="tag">端到端训练</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><div class="card-icon">🔬</div>U-Net</h3>
+                    <div class="card-content">
+                        <p>专为医学图像分割设计的U型网络结构，具有对称的编码器-解码器架构。</p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>多层次特征融合</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>大范围上下文信息</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>数据增强策略</span>
+                            </div>
+                        </div>
+                        <div class="tag-container">
+                            <span class="tag">医学分割</span>
+                            <span class="tag">跳跃连接</span>
+                            <span class="tag">特征融合</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><div class="card-icon">🎯</div>DeepLab</h3>
+                    <div class="card-content">
+                        <p>采用空洞卷积的语义分割网络，能够获得更大的感受野。包含多个改进版本。</p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>空洞空间金字塔池化(ASPP)</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>深度可分离卷积</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>多尺度处理能力</span>
+                            </div>
+                        </div>
+                        <div class="tag-container">
+                            <span class="tag">空洞卷积</span>
+                            <span class="tag">多尺度特征</span>
+                            <span class="tag">语义分割</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><div class="card-icon">🎨</div>Mask R-CNN</h3>
+                    <div class="card-content">
+                        <p>在目标检测基础上扩展的实例分割模型，支持同时检测目标位置和像素级分割。</p>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>RoIAlign精确对齐</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>FPN特征金字塔</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🔹</span>
+                                <span>多任务学习框架</span>
+                            </div>
+                        </div>
+                        <div class="tag-container">
+                            <span class="tag">实例分割</span>
+                            <span class="tag">目标检测</span>
+                            <span class="tag">多任务</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

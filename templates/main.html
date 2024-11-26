@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="PrismIf">
+    <title>医学图像分割处理系统</title>
+    <!-- Preloader -->
+    <style>
+        @keyframes hidePreloader {
+            0% {
+                width: 100%;
+                height: 100%;
+            }
+
+            100% {
+                width: 0;
+                height: 0;
+            }
+        }
+
+        body>div.preloader {
+            position: fixed;
+            background: white;
+            width: 100%;
+            height: 100%;
+            z-index: 1071;
+            opacity: 0;
+            transition: opacity .5s ease;
+            overflow: hidden;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body:not(.loaded)>div.preloader {
+            opacity: 1;
+        }
+
+        body:not(.loaded) {
+            overflow: hidden;
+        }
+
+        body.loaded>div.preloader {
+            animation: hidePreloader .5s linear .5s forwards;
+        }
+
+        /* Custom styles for larger heading */
+        .large-heading {
+            font-size: 4.5rem; /* 使标题更大 */
+            font-weight: bold;
+        }
+
+        /* Custom styles for the paragraph */
+        .custom-paragraph {
+            color: black; /* 字体颜色改为黑色 */
+            font-family: "KaiTi", KaiTi, serif; /* 使用楷体 */
+            letter-spacing: 2px; /* 增加字间距 */
+            font-style: italic; /* 使文本倾斜 */
+            font-weight: bold; /* 加粗文本 */
+            font-size: 3rem; /* 增大字体大小 */
+            line-height: 1.5; /* 增大行高 */
+        }
+
+        /* Background styles */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            background: transparent; /* 确保内容背景是透明的 */
+        }
+
+        section {
+            background-image: url('/static/assets/img/main-bg.jpg');
+            background-size: cover; /* 确保图片覆盖整个背景 */
+            background-position: center; /* 居中显示 */
+            background-repeat: no-repeat; /* 防止图片重复 */
+            height: 100vh; /* 设置高度为视口的100% */
+            display: flex; /* 使内容居中 */
+            align-items: center; /* 垂直居中 */
+            justify-content: center; /* 水平居中 */
+        }
+    </style>
+    <script>
+        window.addEventListener("load", function() {
+            setTimeout(function() {
+                document.querySelector('body').classList.add('loaded');
+            }, 300);
+        });
+    </script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{{url_for('static',filename='assets/libs/@fortawesome/fontawesome-free/css/all.min.css')}}">
+    <!-- Quick CSS -->
+    <link rel="stylesheet" href="{{url_for('static', filename='assets/css/quick-website.css')}}" id="stylesheet">
+</head>
+
+<body>
+
+
+    <!-- Main content -->
+    <section class="slice py-10">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 text-center text-white">
+                    <!-- Heading -->
+                    <h1 class="large-heading mb-4">
+                        <strong>医学图像分割系统</strong>
+                    </h1>
+                    <!-- Text -->
+                    <p class="lead custom-paragraph">
+                        <strong>欢迎使用我们的系统！</strong>
+                    </p>
+                    <!-- Buttons -->
+                    <div class="mt-5">
+                        <a href="/example" class="btn btn-primary btn-icon" target="_blank">
+                            <span class="btn-inner--text">医学图像分割介绍</span>
+                        </a>
+                        <a href="/live-index" class="btn btn-primary btn-icon d-inline-block" target="_blank">
+                            <span class="btn-inner--text">开始检测</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core JS  -->
+    <script src="{{url_for('static', filename='assets/libs/jquery/dist/jquery.min.js')}}"></script>
+    <script src="{{url_for('static', filename='assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{url_for('static', filename='assets/libs/svg-injector/dist/svg-injector.min.js')}}"></script>
+    <!-- Quick JS -->
+    <script src="{{url_for('static', filename='assets/js/quick-website.js')}}"></script>
+</body>
+</html>

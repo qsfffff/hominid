@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医学图像分割介绍</title>
+
+    <!-- 保留原有内容样式 -->
+    <link rel="stylesheet" href="{{url_for('static', filename='assets/css/quick-website.css')}}" id="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+    <style>
+        /* Reset and body styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            background-color: #f5f6fa;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            width: 280px;
+            background-color: #2B4876;
+            color: white;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+        .logo {
+            padding: 25px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 26px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        .nav-menu {
+            list-style: none;
+        }
+        .nav-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        .nav-item a {
+            padding: 12px 20px;
+            display: block;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        .nav-item:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: #fff;
+            transform: translateX(5px);
+        }
+
+        /* Top navigation bar styling */
+        .top-nav {
+            background-color: white;
+            padding: 15px 30px;
+            display: flex;
+            gap: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .top-nav a {
+            color: #2B4876;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 20px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .top-nav a:hover {
+            background: rgba(42,82,152,0.1);
+        }
+
+        /* Content section layout */
+        #content {
+            width: calc(100% - 280px);
+            margin-left: 0px;
+            transition: all 0.3s;
+            min-height: 100vh;
+        }
+
+         /* Content styling */
+        .content-section {
+            padding: 40px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin: 20px;
+        }
+
+        .content-section h5 {
+            color: #1e3c72;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .content-section p {
+            color: #555;
+            line-height: 1.7;
+        }
+
+        .content-section a {
+            color: #2a5298;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .content-section a:hover {
+            color: #1e3c72;
+        }
+
+        /* Dropdown styling */
+        .dropdown-menu {
+            display: none;
+            list-style: none;
+            padding-left: 0;
+            background-color: #2B4876;
+            position: absolute;
+            left: 20px;
+            top: 100%;
+            width: calc(100% - 40px);
+            z-index: 1;
+            border-radius: 5px;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .dropdown-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+    </style>
+
+    <script>
+        // Toggle dropdown menu display
+        function toggleDropdownMenu() {
+            var dropdownMenu = document.querySelector('.dropdown-menu');
+            dropdownMenu.classList.toggle('show');
+        }
+    </script>
+
+</head>
+
+<body class="bg-section-secondary">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">医学图像分割</div>
+        <nav class="nav-menu">
+            <a href="/example" class="nav-item"><i>📊</i>常用数据集</a>
+            <a href="../about" class="nav-item"><i>🔍</i>常用算法</a>
+            <div class="nav-item dropdown-toggle" onclick="toggleDropdownMenu()">
+                <i>🔄</i>传统分割方法
+                <ul class="dropdown-menu">
+                    <li><a href="/example/classic/hippocampus" class="dropdown-item">BraTs海马体数据集</a></li>
+                    <li><a href="/example/classic/chest" class="dropdown-item">Chest胸腔数据集</a></li>
+                    <li><a href="/example/classic/eye" class="dropdown-item">DRIVE眼底血管数据集</a></li>
+                </ul>
+            </div>
+            <a href="/example/dl" class="nav-item"><i>🧠</i>深度学习分割方法</a>
+        </nav>
+    </div>
+
+    <!-- Main content -->
+    <div id="content">
+        <!-- Top navigation -->
+        <div class="top-nav">
+            <div style="margin-left: auto;">
+                <a href="/">🏠 主页</a>
+                <a href="/live-index">▶️ 开始检测</a>
+            </div>
+        </div>
+
+        <!-- 保留原有内容样式的内容部分 -->
+        <div class="content-section">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h5 class="h3">常用医学图像数据集介绍</h5>
+                    <p class="my-4">
+                        一个完好的医学图像数据集对医学图像处理研究有巨大的帮助，在医学图像分割中常见的数据集大多来自于各式各样的
+                        <a href="https://grand-challenge.org/" target="_blank">分割挑战赛</a>，其中最为常见的有：
+                    </p>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <a href="https://www.med.upenn.edu/cbica/brats2021/" target="_blank">
+                                <i class="fas fa-angle-right mr-2"></i>多模态脑肿瘤分割挑战
+                            </a>
+                        </li>
+                        <li class="mb-3">
+                            <a href="http://medicaldecathlon.com/" target="_blank">
+                                <i class="fas fa-angle-right mr-2"></i>Medical Segmentation Decathlon 医学图像分割十项全能比赛
+                            </a>
+                        </li>
+                        <li class="mb-3">
+                            <a href="https://www.oasis-brains.org/" target="_blank">
+                                <i class="fas fa-angle-right mr-2"></i>OASIS 脑部阿尔茨海默数据集
+                            </a>
+                        </li>
+                        <li class="mb-3">
+                            <a href="https://drive.grand-challenge.org/" target="_blank">
+                                <i class="fas fa-angle-right mr-2"></i>DRIVE 用于血管提取的视网膜图像数据集
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="my-4">
+                        更多的数据集可以参考：<a href="https://github.com/linhandev/dataset" target="_blank">
+                            <i class="fab fa-github mr-1"></i>医学影像数据集集锦
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

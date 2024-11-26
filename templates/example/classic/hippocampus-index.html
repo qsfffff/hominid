@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="PrismIf">
+
+    <title>海马体图像数据集示例</title>
+
+    <!-- 加载必要的CSS样式 -->
+    <link href="{{ url_for('static',filename='assets/libs/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static',filename='assets/css/example.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/quick-website.css') }}" id="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static',filename='assets/libs/@fortawesome/fontawesome-free/css/all.min.css') }}">
+
+    <style>
+        /* 样式设置 */
+        body {
+            display: flex;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 280px;
+            background-color: #2B4876;
+            color: white;
+            padding: 20px 0;
+            flex-shrink: 0;
+            height: 100vh;
+            position: fixed;
+        }
+        .main-content {
+            margin-left: 25px;
+            padding: 20px;
+            flex-grow: 1;
+            width: calc(100% - 280px);
+        }
+        .logo {
+            padding: 25px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 26px;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+        }
+        .nav-item {
+            padding: 15px 20px;
+            color: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .nav-item:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .dropdown-menu {
+            display: none;
+            list-style: none;
+            padding-left: 0;
+            background-color: #2B4876;
+            position: absolute;
+            top: 100%;
+            width: 100%;
+            z-index: 1;
+            border-radius: 5px;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .dropdown-item {
+            padding: 10px 30px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        /* Top navigation bar styling */
+        .top-nav {
+            background-color: white;
+            padding: 15px 30px;
+            display: flex;
+            gap: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .top-nav a {
+            color: #2B4876;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 20px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .top-nav a:hover {
+            background: rgba(42,82,152,0.1);
+        }
+    </style>
+
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">医学图像分割</div>
+        <nav class="nav-menu">
+            <a href="/example" class="nav-item"><i>📊</i>常用数据集</a>
+            <a href="../../about" class="nav-item"><i>🔍</i>常用算法</a>
+            <div class="nav-item dropdown-toggle" onclick="toggleDropdownMenu(event)">
+                <i>🔄</i>传统分割方法
+                <ul class="dropdown-menu" style="position: relative;">
+                    <li><a href="/example/classic/hippocampus" class="dropdown-item">BraTs海马体数据集</a></li>
+                    <li><a href="/example/classic/chest" class="dropdown-item">Chest胸腔数据集</a></li>
+                    <li><a href="/example/classic/eye" class="dropdown-item">DRIVE眼底血管数据集</a></li>
+                </ul>
+            </div>
+            <a href="/example/dl" class="nav-item"><i>🧠</i>深度学习分割方法</a>
+        </nav>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <!-- Top navigation bar -->
+        <div class="top-nav">
+            <div style="margin-left: auto;">
+                <a href="/">🏠 主页</a>
+                <a href="/live-index">▶️ 开始检测</a>
+            </div>
+        </div>
+
+        <!-- Page content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">海马体图像数据集示例</h1>
+            </div>
+            <h5>不同算法的评估数据对比</h5>
+            <div class="row mt-4 text-center">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body pb-6">
+                            <div id="container1" style='width:480px;height:440px;'></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body pb-6">
+                            <div id="container2" style='width:480px;height:440px;'></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h2>数据</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th style="text-align:center;vertical-align: middle" scope="col">#</th>
+                        <th style="text-align:center;vertical-align: middle" scope="col">OTSU 基于阈值</th>
+                        <th style="text-align:center;vertical-align: middle" scope="col">FCM 基于模糊聚类</th>
+                        <th style="text-align:center;vertical-align: middle" scope="col">DRLSE 基于可活动轮廓</th>
+                        <th style="text-align:center;vertical-align: middle" scope="col">UNET 基于深度学习</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td style="text-align:center;vertical-align: middle">{{header[0]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data1[0]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data2[0]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data3[0]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data4[0]}}</td>
+
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;vertical-align: middle">{{header[1]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data1[1]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data2[1]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data3[1]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data4[1]}}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;vertical-align: middle">{{header[2]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data1[2]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data2[2]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data3[2]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data4[2]}}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;vertical-align: middle">{{header[3]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data1[3]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data2[3]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data3[3]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data4[3]}}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;vertical-align: middle">{{header[4]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data1[4]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data2[4]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data3[4]}}</td>
+                        <td style="text-align:center;vertical-align: middle">{{data4[4]}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</div>
+
+    <script>
+        function toggleDropdownMenu(event) {
+            event.stopPropagation();
+            let dropdownMenu = event.currentTarget.querySelector('.dropdown-menu');
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu !== dropdownMenu) menu.classList.remove('show');
+            });
+            dropdownMenu.classList.toggle('show');
+        }
+
+        document.addEventListener('click', function () {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
+        });
+    </script>
+
+<!-- Core JS  -->
+<script src="{{url_for('static', filename='assets/libs/jquery/dist/jquery.min.js')}}"></script>
+<script src="{{url_for('static', filename='assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')}}"></script>
+<script src="{{url_for('static', filename='assets/libs/svg-injector/dist/svg-injector.min.js')}}"></script>
+<!-- Quick JS -->
+<script src="{{url_for('static', filename='assets/js/quick-website.js')}}"></script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"
+        integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"
+        integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha"
+        crossorigin="anonymous"></script>
+<!-- Echarts JS -->
+<script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+
+<script type="text/javascript">
+    $.ajax({
+        type: 'GET',
+        url: '/index_data_hippocampus',
+        dataType: 'json',
+        success: function (data) {
+            var dom = document.getElementById('container1');
+
+            var myChart = echarts.init(dom, null, {
+                renderer: 'canvas',
+                useDirtyRect: false
+            });
+            var app = {};
+            var option;
+
+            option = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['OTSU', 'FCM', 'DRLSE', 'UNET']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: data['data1']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: 'OTSU',
+                        type: 'line',
+                        data: data['data2']
+                    },
+                    {
+                        name: 'FCM',
+                        type: 'line',
+                        data: data['data3']
+                    },
+                    {
+                        name: 'DRLSE',
+                        type: 'line',
+                        data: data['data4']
+                    },
+                    {
+                        name: 'UNET',
+                        type: 'line',
+                        data: data['data5']
+                    }
+                ]
+            };
+            if (option && typeof option === 'object') {
+                myChart.setOption(option);
+            }
+            window.addEventListener('resize', myChart.resize);
+        }
+    });
+</script>
+<script type="text/javascript">
+    $.ajax({
+        type: 'GET',
+        url: '/index_data_hippocampus',
+        dataType: 'json',
+        success: function (data) {
+            var dom = document.getElementById('container2');
+            var myChart = echarts.init(dom, null, {
+                renderer: 'canvas',
+                useDirtyRect: false
+            });
+            var app = {};
+            var option;
+            let xAxisData = ['DICE', 'JC', 'Precision', 'Recall'];
+
+            var emphasisStyle = {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowColor: 'rgba(0,0,0,0.3)'
+                }
+            };
+            option = {
+                legend: {
+                    data: data['header'],
+                    left: '10%'
+                },
+
+                toolbox: {
+                    feature: {
+                        magicType: {
+                            type: ['stack']
+                        },
+                        saveAsImage: {},
+                    }
+                },
+
+                xAxis: {
+                    data: xAxisData,
+                    name: 'X Axis',
+                    axisLine: {onZero: true},
+                    splitLine: {show: false},
+                    splitArea: {show: false}
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: {
+                        show: false,
+                        lineStyle: {
+                            color: '#d9e1e4'
+                        },
+                    },
+                    axisLabel: {
+                        color: '#4e5b5f',
+                    },
+                    axisTick: {
+                        show: false,
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            type: 'dashed'
+                        }
+                    }
+                },
+                grid: {
+                    bottom: 30
+                },
+                series: [
+                    {
+                        name: 'OTSU',
+                        type: 'bar',
+                        stack: 'one',
+                        emphasis: emphasisStyle,
+                        data: data['data2']
+                    },
+                    {
+                        name: 'FCM',
+                        type: 'bar',
+                        stack: 'two',
+                        emphasis: emphasisStyle,
+                        data: data['data3']
+                    },
+                    {
+                        name: 'DRLSE',
+                        type: 'bar',
+                        stack: 'two',
+                        emphasis: emphasisStyle,
+                        data: data['data4']
+                    },
+                    {
+                        name: 'UNET',
+                        type: 'bar',
+                        stack: 'two',
+                        emphasis: emphasisStyle,
+                        data: data['data5']
+                    }
+                ]
+            };
+
+            myChart.on('brushSelected', function (params) {
+                var brushed = [];
+                var brushComponent = params.batch[0];
+                for (var sIdx = 0; sIdx < brushComponent.selected.length; sIdx++) {
+                    var rawIndices = brushComponent.selected[sIdx].dataIndex;
+                    brushed.push('[Series ' + sIdx + '] ' + rawIndices.join(', '));
+                }
+                myChart.setOption({
+                    title: {
+                        backgroundColor: '#333',
+                        bottom: 0,
+                        right: '10%',
+                        width: 100,
+                        textStyle: {
+                            fontSize: 12,
+                            color: '#fff'
+                        }
+                    }
+                });
+            });
+            if (option && typeof option === 'object') {
+                myChart.setOption(option);
+            }
+
+            window.addEventListener('resize', myChart.resize);
+        }
+    });
+</script>
+
+</body>
+</html>
